@@ -12,6 +12,8 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
     private Button mBntok;
     private Button mBntclr;
+    private Button mBntchange;
+    private int mMode;
     private EditText mUsrName;
     private EditText mPw1;
     private EditText mPw2;
@@ -23,9 +25,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mBntok = (Button) findViewById(R.id.bntok);
         mBntclr = (Button) findViewById(R.id.bntclr);
+        mBntchange = (Button) findViewById(R.id.bntchange);
         mUsrName = (EditText) findViewById(R.id.userid);
         mPw1 = (EditText) findViewById(R.id.pw1);
         mPw2 = (EditText) findViewById(R.id.pw2);
+        mMode = 1;
 
         MyPw = GetStoredPW();
 
@@ -52,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
                         ed.putString("pw", NewPW);
                         ed.commit();
                         Intent intent = new Intent();
-                        intent.setClass(MainActivity.this, SysuActivity.class);
+                        intent.setClass(MainActivity.this, UrlActivity.class);
                         MainActivity.this.startActivity(intent);
                     }
                 }
@@ -70,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
                     else
                     {
                         Intent intent = new Intent();
-                        intent.setClass(MainActivity.this, SysuActivity.class);
+                        intent.setClass(MainActivity.this, UrlActivity.class);
                         MainActivity.this.startActivity(intent);
                     }
                 }
@@ -81,11 +85,35 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v)
             {
-
                 mPw2.setText("");
                 mUsrName.setText("");
                 if(!isStored)
                     mPw1.setText("");
+            }
+        });
+
+        mBntchange.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v)
+            {
+                if(mMode == 1){
+                    mMode = 2;
+                    mBntchange.setText("切换至注册界面");
+                    mPw1.setVisibility(View.INVISIBLE);
+                    mPw2.setHint("Password");
+                    mPw2.setText("");
+                    mUsrName.setText("");
+                }
+                else{
+                    mMode = 1;
+                    mBntchange.setText("切换至登录界面");
+                    mPw1.setVisibility(View.VISIBLE);
+                    mPw1.setHint("New Password");
+                    mPw2.setHint("Comfirm Password");
+                    mPw1.setText("");
+                    mPw2.setText("");
+                    mUsrName.setText("");
+                }
             }
         });
     }

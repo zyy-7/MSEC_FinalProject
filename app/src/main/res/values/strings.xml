@@ -5,11 +5,7 @@
     <string name="hint2">Comfirm Password</string>
     <string name="ok">OK</string>
     <string name="clear">CLEAR</string>
-    <string name="save">SAVE</string>
-    <string name="load">LOAD</string>
-    <string name="delete">DELETE</string>
-    <string name="filenamehint">File Name Here</string>
-    <string name="filecontenthint">File Content Here</string>
-    <string name="feditor">File Editor</string>
     <string name="sysu_url">点击此进入中山大学本科教务系统</string>
+    <string name="changetologin">切换至登录界面</string>
+    <string name="changetoregister">切换至注册界面</string>
 </resources>

@@ -17,8 +17,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText mUsrName;
     private EditText mPw1;
     private EditText mPw2;
-    private boolean isStored = false;
-    private String MyPw;
+    private static final int DECODE_ENCRYPTION_KEY = 64;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,15 +28,14 @@ public class MainActivity extends AppCompatActivity {
         mUsrName = (EditText) findViewById(R.id.userid);
         mPw1 = (EditText) findViewById(R.id.pw1);
         mPw2 = (EditText) findViewById(R.id.pw2);
+        //mode为1时，处于注册界面；mode等于2时，处于登录界面
         mMode = 1;
-
-        MyPw = GetStoredPW();
 
         mBntok.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v)
             {
-                if(!isStored)
+                if(mMode == 1)
                 {
                     String NewPW = mPw1.getText().toString();
                     String ConfirmPW = mPw2.getText().toString();
@@ -51,9 +49,12 @@ public class MainActivity extends AppCompatActivity {
                     }
                     else
                     {
+                        String username = mUsrName.getText().toString();
                         SharedPreferences sp = getSharedPreferences("PassWord", MODE_PRIVATE);
                         SharedPreferences.Editor ed = sp.edit();
-                        ed.putString("pw", NewPW);
+                        //加密
+                        NewPW = encryptionString(NewPW, DECODE_ENCRYPTION_KEY);
+                        ed.putString(username, NewPW);
                         ed.commit();
                         Intent intent = new Intent();
                         intent.setClass(MainActivity.this, UrlActivity.class);
@@ -62,12 +63,17 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else
                 {
+                    String Username = mUsrName.getText().toString();
+                    SharedPreferences sp = getSharedPreferences("PassWord", MODE_PRIVATE);
+                    String pw = sp.getString(Username, "");
+                    pw = decodeString(pw, DECODE_ENCRYPTION_KEY);
                     String Pw = mPw2.getText().toString();
+
                     if(Pw.equals(""))
                     {
                         Toast.makeText(MainActivity.this, "Password cannot be empty.", Toast.LENGTH_SHORT).show();
                     }
-                    else if(!Pw.equals(MyPw))
+                    else if(!Pw.equals(pw))
                     {
                         Toast.makeText(MainActivity.this, "Password MisMatch.", Toast.LENGTH_SHORT).show();
                     }
@@ -87,8 +93,9 @@ public class MainActivity extends AppCompatActivity {
             {
                 mPw2.setText("");
                 mUsrName.setText("");
-                if(!isStored)
+                if(mMode == 1){
                     mPw1.setText("");
+                }
             }
         });
 
@@ -117,20 +124,32 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-    private String GetStoredPW()
-    {
-        SharedPreferences sp = getSharedPreferences("PassWord", MODE_PRIVATE);
-        String pw = sp.getString("pw", "");
-
-        if(!pw.equals("")){
-            mPw1.setVisibility(View.INVISIBLE);
-            mPw2.setHint("Password");
-            mPw2.setText("");
-            isStored = true;
+    /**
+     * 加密方法
+     * @param str 要加密的字符串
+     * @param key 加密的密匙
+     * @return 返回加密后的字符串
+     */
+    private String encryptionString(String str, int key) {
+        char[] chars = str.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+            chars[i] = (char) (chars[i] + key);
         }
-        return pw;
+        return String.valueOf(chars);
     }
 
+    /**
+     * 解密方法
+     * @param str 要解密的字符串
+     * @param key 解密的密匙，跟加密一样
+     * @return 返回解密后的字符串
+     */
+    private String decodeString(String str, int key) {
+        char[] chars = str.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+            chars[i] = (char) (chars[i] - key);
+        }
+        return String.valueOf(chars);
+    }
 }
 
